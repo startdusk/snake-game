@@ -1,0 +1,6 @@
+we need to compile Rust to Webassembly code 
+Webassembly can be executed in the browser
+it runs at native speed
+3d apps, cad, virtual reality, system application, games
+
+// https://webassembly.github.io/wabt/demo/wat2wasm/
