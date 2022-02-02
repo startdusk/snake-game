@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use wasm_bindgen::prelude::*;
 use wee_alloc::WeeAlloc;
 
@@ -13,16 +14,25 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 // npm install
 // npm run dev
 
+#[derive(PartialEq)]
+enum Direction {
+    Up,
+    Right,
+    Down,
+    Left,
+}
 struct SnakeCell(usize);
 
 struct Snake {
     body: Vec<SnakeCell>,
+    direction: Direction,
 }
 
 impl Snake {
     fn new(spawn_index: usize) -> Self {
         Snake {
             body: vec![SnakeCell(spawn_index)],
+            direction: Direction::Left,
         }
     }
 }
@@ -54,6 +64,12 @@ impl World {
 
     pub fn update(&mut self) {
         let snake_idx = self.snake_head_idx();
-        self.snake.body[0].0 = (snake_idx + 1) % self.size;
+
+        if self.snake.direction == Direction::Right {
+            self.snake.body[0].0 = (snake_idx + 1) % self.size;
+        }
+        if self.snake.direction == Direction::Left {
+            self.snake.body[0].0 = (snake_idx - 1) % self.size;
+        }
     }
 }
