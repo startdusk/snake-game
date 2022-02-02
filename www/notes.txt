@@ -4,3 +4,7 @@ it runs at native speed
 3d apps, cad, virtual reality, system application, games
 
 // https://webassembly.github.io/wabt/demo/wat2wasm/
+
+// using ts
+// https://webpack.js.org/guides/typescript/
+// install typescript ts-loader
