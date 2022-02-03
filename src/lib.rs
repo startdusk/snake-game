@@ -119,23 +119,40 @@ impl World {
     fn gen_next_snake_cell(&self) -> SnakeCell {
         let snake_idx = self.snake_head_idx();
         let row = snake_idx / self.width;
+        // 除法在wasm-pack打包后体积会很大，所以改用了加法
         return match self.snake.direction {
-            Direction::Right => SnakeCell((row * self.width) + (snake_idx + 1) % self.width),
-            Direction::Up => SnakeCell((snake_idx - self.width) % self.size),
-            Direction::Down => SnakeCell((snake_idx + self.width) % self.size),
-            Direction::Left => SnakeCell((row * self.width) + (snake_idx - 1) % self.width),
+            Direction::Right => {
+                let treshold = (row + 1) * self.width;
+                if snake_idx + 1 == treshold {
+                    SnakeCell(treshold - self.width)
+                } else {
+                    SnakeCell(snake_idx + 1)
+                }
+            }
+            Direction::Left => {
+                let treshold = row * self.width;
+                if snake_idx == treshold {
+                    SnakeCell(treshold + (self.width - 1))
+                } else {
+                    SnakeCell(snake_idx - 1)
+                }
+            }
+            Direction::Up => {
+                let treshold = snake_idx - (row * self.width);
+                if snake_idx == treshold {
+                    SnakeCell((self.size - self.width) + treshold)
+                } else {
+                    SnakeCell(snake_idx - self.width)
+                }
+            }
+            Direction::Down => {
+                let treshold = snake_idx + ((self.width - row) * self.width);
+                if snake_idx + self.width == treshold {
+                    SnakeCell(treshold - ((row * 1) * self.width))
+                } else {
+                    SnakeCell(snake_idx + self.width)
+                }
+            }
         };
-    }
-
-    fn set_snake_head(&mut self, idx: usize) {
-        self.snake.body[0].0 = idx;
-    }
-
-    fn index_to_cell(&self, idx: usize) -> (usize, usize) {
-        (idx / self.width, idx % self.width)
-    }
-
-    fn cell_to_index(&self, row: usize, col: usize) -> usize {
-        (row * self.width) + col
     }
 }
