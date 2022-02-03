@@ -1,6 +1,9 @@
 import init, { World, Direction } from "snake_game";
 
-init().then((_) => {
+const HEADER_COLOR = "#7878db";
+const UNHEADER_COLOR = "#000000";
+
+init().then((wasm) => {
   const CELL_SIZE = 10;
   const WORLD_WIDTH = 8;
   const snakeSpawnIdx = Date.now() % (WORLD_WIDTH * WORLD_WIDTH);
@@ -51,12 +54,18 @@ init().then((_) => {
   }
 
   function drawSnake() {
-    const snakeIdx = world.snake_head_idx();
-    const col = snakeIdx % worldWidth;
-    const row = Math.floor(snakeIdx / worldWidth);
-
-    ctx.beginPath();
-    ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    const snakeCells = new Uint32Array(
+      wasm.memory.buffer,
+      world.snake_cells(),
+      world.snake_length()
+    );
+    snakeCells.forEach((cellIdx, i) => {
+      const col = cellIdx % worldWidth;
+      const row = Math.floor(cellIdx / worldWidth);
+      ctx.fillStyle = i === 0 ? HEADER_COLOR : UNHEADER_COLOR;
+      ctx.beginPath();
+      ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    });
     ctx.stroke();
   }
 
@@ -70,7 +79,7 @@ init().then((_) => {
     setTimeout(() => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       paint();
-      world.update();
+      world.step();
       // the method takes a callback
       // to invoked before the next repaint
       requestAnimationFrame(update);
