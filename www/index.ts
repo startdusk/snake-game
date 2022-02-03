@@ -1,4 +1,4 @@
-import init, { World } from "snake_game";
+import init, { World, Direction } from "snake_game";
 
 init().then((_) => {
   const CELL_SIZE = 10;
@@ -11,6 +11,22 @@ init().then((_) => {
   const canvas = <HTMLCanvasElement>document.getElementById("snake-canvas");
   const ctx = canvas.getContext("2d");
 
+  document.addEventListener("keydown", (ev: KeyboardEvent) => {
+    switch (ev.code) {
+      case "ArrowUp":
+        world.change_snake_dir(Direction.Up);
+        break;
+      case "ArrowDown":
+        world.change_snake_dir(Direction.Down);
+        break;
+      case "ArrowLeft":
+        world.change_snake_dir(Direction.Left);
+        break;
+      case "ArrowRight":
+        world.change_snake_dir(Direction.Right);
+        break;
+    }
+  });
   canvas.height = worldWidth * CELL_SIZE;
   canvas.width = worldWidth * CELL_SIZE;
 
