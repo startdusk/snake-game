@@ -30,6 +30,13 @@ pub enum Direction {
     Left,
 }
 
+#[wasm_bindgen]
+pub enum GameStatus {
+    Won,
+    Lost,
+    Played,
+}
+
 #[derive(Clone, Copy, PartialEq)]
 pub struct SnakeCell(usize);
 
@@ -59,6 +66,7 @@ pub struct World {
     snake: Snake,
     next_cell: Option<SnakeCell>,
     reward_cell: usize,
+    status: Option<GameStatus>,
 }
 
 #[wasm_bindgen]
@@ -92,6 +100,7 @@ impl World {
             size,
             snake,
             next_cell: None,
+            status: None,
         }
     }
 
@@ -138,34 +147,46 @@ impl World {
     }
 
     pub fn step(&mut self) {
-        // tmp是记录原贪吃蛇的位置信息，方便后面更新蛇身的位置
-        let tmp = self.snake.body.clone();
+        match self.status {
+            Some(GameStatus::Played) => {
+                // tmp是记录原贪吃蛇的位置信息，方便后面更新蛇身的位置
+                let tmp = self.snake.body.clone();
 
-        // 更新贪吃蛇头的位置
-        match self.next_cell {
-            // 通过方向键改变蛇头的位置
-            Some(cell) => {
-                self.snake.body[0] = cell;
-                self.next_cell = None;
+                // 更新贪吃蛇头的位置
+                match self.next_cell {
+                    // 通过方向键改变蛇头的位置
+                    Some(cell) => {
+                        self.snake.body[0] = cell;
+                        self.next_cell = None;
+                    }
+                    // 同一个方向上自动生成蛇头的位置
+                    None => {
+                        self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
+                    }
+                }
+
+                // 更新贪吃蛇蛇身的位置
+                // 蛇头更新了，那蛇身就会往原蛇头的位置挪动并覆盖
+                let len = self.snake.body.len();
+                for i in 1..len {
+                    self.snake.body[i] = SnakeCell(tmp[i - 1].0);
+                }
+
+                // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
+                if self.reward_cell == self.snake_head_idx() {
+                    // 添加蛇身长度在蛇头后一个位置，整条蛇爬过后才会出现新的蛇身
+                    self.snake.body.push(SnakeCell(self.snake.body[1].0));
+
+                    if self.snake_length() < self.size {
+                        self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
+                    } else {
+                        self.reward_cell = 100;
+                    }
+                }
             }
-            // 同一个方向上自动生成蛇头的位置
-            None => {
-                self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
-            }
-        }
-
-        // 更新贪吃蛇蛇身的位置
-        // 蛇头更新了，那蛇身就会往原蛇头的位置挪动并覆盖
-        let len = self.snake.body.len();
-        for i in 1..len {
-            self.snake.body[i] = SnakeCell(tmp[i - 1].0);
-        }
-
-        // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
-        if self.reward_cell == self.snake_head_idx() {
-            // 添加蛇身长度在蛇头后一个位置，整条蛇爬过后才会出现新的蛇身
-            self.snake.body.push(SnakeCell(self.snake.body[1].0));
-            self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body)
+            Some(GameStatus::Lost) => {}
+            Some(GameStatus::Won) => {}
+            None => {}
         }
     }
 
