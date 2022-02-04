@@ -23,7 +23,7 @@ pub enum Direction {
     Left,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct SnakeCell(usize);
 
 struct Snake {
@@ -50,6 +50,7 @@ pub struct World {
     width: usize,
     size: usize,
     snake: Snake,
+    next_cell: Option<SnakeCell>,
 }
 
 #[wasm_bindgen]
@@ -79,6 +80,7 @@ impl World {
             width,
             size: width * width,
             snake: Snake::new(spawn_idx, 3),
+            next_cell: None,
         }
     }
 
@@ -92,9 +94,12 @@ impl World {
 
     pub fn change_snake_dir(&mut self, direction: Direction) {
         let next_cell = self.gen_next_snake_cell(&direction);
+        // 禁止反方向移动
         if self.snake.body.len() > 1 && self.snake.body[1].0 == next_cell.0 {
             return;
         }
+        // 通过按键 更新下一步蛇头要到的位置
+        self.next_cell = Some(next_cell);
         self.snake.direction = direction;
     }
 
@@ -120,9 +125,19 @@ impl World {
     pub fn step(&mut self) {
         // tmp是记录原贪吃蛇的位置信息，方便后面更新蛇身的位置
         let tmp = self.snake.body.clone();
-        let next_cell = self.gen_next_snake_cell(&self.snake.direction);
+
         // 更新贪吃蛇头的位置
-        self.snake.body[0] = next_cell;
+        match self.next_cell {
+            // 通过方向键改变蛇头的位置
+            Some(cell) => {
+                self.snake.body[0] = cell;
+                self.next_cell = None;
+            }
+            // 同一个方向上自动生成蛇头的位置
+            None => {
+                self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
+            }
+        }
 
         // 更新贪吃蛇蛇身的位置
         // 蛇头更新了，那蛇身就会往原蛇头的位置挪动并覆盖
