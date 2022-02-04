@@ -12,8 +12,14 @@ init().then((wasm) => {
   const world = World.new(WORLD_WIDTH, snakeSpawnIdx);
   const worldWidth = world.width();
 
+  const gameControlBtn = document.getElementById("game-control-btn");
   const canvas = <HTMLCanvasElement>document.getElementById("snake-canvas");
   const ctx = canvas.getContext("2d");
+
+  gameControlBtn.addEventListener("click", (_) => {
+    world.start_game();
+    play();
+  });
 
   document.addEventListener("keydown", (ev: KeyboardEvent) => {
     switch (ev.code) {
@@ -92,7 +98,7 @@ init().then((wasm) => {
     drawReward();
   }
 
-  function update() {
+  function play() {
     const fps = 3;
     setTimeout(() => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -100,10 +106,9 @@ init().then((wasm) => {
       world.step();
       // the method takes a callback
       // to invoked before the next repaint
-      requestAnimationFrame(update);
+      requestAnimationFrame(play);
     }, 1000 / fps);
   }
 
   paint();
-  update();
 });
