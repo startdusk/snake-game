@@ -5,7 +5,7 @@ const HEADER_COLOR = "#7878db";
 const UNHEADER_COLOR = "#000000";
 
 init().then((wasm) => {
-  const CELL_SIZE = 10;
+  const CELL_SIZE = 20;
   const WORLD_WIDTH = 8;
   const snakeSpawnIdx = rnd(WORLD_WIDTH * WORLD_WIDTH);
 
