@@ -6,6 +6,11 @@ use wee_alloc::WeeAlloc;
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
+#[wasm_bindgen(module = "/www/utils/date.js")]
+extern {
+    fn now() -> usize;
+}
+
 // 编译成前端可导入代码: wasm-pack build web
 // 前端www依赖该编译代码:
 //   "dependencies": {
@@ -13,7 +18,6 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 //   },
 // npm install
 // npm run dev
-
 #[wasm_bindgen]
 #[derive(PartialEq)]
 pub enum Direction {
@@ -77,12 +81,14 @@ impl World {
     // 48 49 50 51 52 53 54 55
     // 56 57 58 59 60 61 62 63
     pub fn new(width: usize, spawn_idx: usize) -> World {
+        let size = width * width;
+        let reward_cell = now() % size;
         World {
             width,
-            size: width * width,
+            size,
             snake: Snake::new(spawn_idx, 3),
             next_cell: None,
-            reward_cell: 10,
+            reward_cell,
         }
     }
 
