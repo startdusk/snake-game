@@ -31,6 +31,7 @@ pub enum Direction {
 }
 
 #[wasm_bindgen]
+#[derive(Copy, Clone)]
 pub enum GameStatus {
     Won,
     Lost,
@@ -118,6 +119,19 @@ impl World {
 
     pub fn start_game(&mut self) {
         self.status = Some(GameStatus::Played);
+    }
+
+    pub fn game_status(&self) -> Option<GameStatus> {
+        self.status
+    }
+
+    pub fn game_status_text(&self) -> String {
+        match self.status {
+            Some(GameStatus::Won) => String::from("You have won!"),
+            Some(GameStatus::Lost) => String::from("You have lost!"),
+            Some(GameStatus::Played) => String::from("Playing"),
+            None => String::from("No Status"),
+        }
     }
 
     pub fn change_snake_dir(&mut self, direction: Direction) {

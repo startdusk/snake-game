@@ -3,6 +3,7 @@ import { rnd } from "./utils/md";
 
 const HEADER_COLOR = "#7878db";
 const UNHEADER_COLOR = "#000000";
+const REWARD_COLOR = "#ff0000";
 
 init().then((wasm) => {
   const CELL_SIZE = 20;
@@ -12,13 +13,20 @@ init().then((wasm) => {
   const world = World.new(WORLD_WIDTH, snakeSpawnIdx);
   const worldWidth = world.width();
 
+  const gameStatus = document.getElementById("game-status");
   const gameControlBtn = document.getElementById("game-control-btn");
   const canvas = <HTMLCanvasElement>document.getElementById("snake-canvas");
   const ctx = canvas.getContext("2d");
 
   gameControlBtn.addEventListener("click", (_) => {
-    world.start_game();
-    play();
+    const status = world.game_status();
+    if (status === undefined) {
+      gameControlBtn.textContent = "Playing...";
+      world.start_game();
+      play();
+    } else {
+      location.reload();
+    }
   });
 
   document.addEventListener("keydown", (ev: KeyboardEvent) => {
@@ -67,7 +75,7 @@ init().then((wasm) => {
     const row = Math.floor(idx / worldWidth);
 
     ctx.beginPath();
-    ctx.fillStyle = "#FF0000";
+    ctx.fillStyle = REWARD_COLOR;
     ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     ctx.stroke();
   }
@@ -88,10 +96,15 @@ init().then((wasm) => {
     ctx.stroke();
   }
 
+  function drawGameStatus() {
+    gameStatus.textContent = world.game_status_text();
+  }
+
   function paint() {
     drawWorld();
     drawSnake();
     drawReward();
+    drawGameStatus();
   }
 
   function play() {
