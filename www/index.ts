@@ -53,6 +53,7 @@ init().then((wasm) => {
     ctx.stroke();
   }
 
+  // 生成贪吃蛇要吃的食物方块
   function drawReward() {
     const idx = world.reward_cell();
     const col = idx % worldWidth;
