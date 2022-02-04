@@ -6,9 +6,12 @@ use wee_alloc::WeeAlloc;
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
-#[wasm_bindgen(module = "/www/utils/date.js")]
-extern {
-    fn now() -> usize;
+// extern 和 extern "C" 的区别: https://stackoverflow.com/questions/44664703/whats-the-difference-between-extern-fn-and-extern-c-fn-in-rust
+// 答案是没区别。。
+// 这是调用外部的js的rnd函数
+#[wasm_bindgen(module = "/www/utils/md.js")]
+extern "C" {
+    fn rnd(max: usize) -> usize;
 }
 
 // 编译成前端可导入代码: wasm-pack build web
@@ -27,7 +30,7 @@ pub enum Direction {
     Left,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct SnakeCell(usize);
 
 struct Snake {
@@ -81,12 +84,20 @@ impl World {
     // 48 49 50 51 52 53 54 55
     // 56 57 58 59 60 61 62 63
     pub fn new(width: usize, spawn_idx: usize) -> World {
+        let snake = Snake::new(spawn_idx, 3);
         let size = width * width;
-        let reward_cell = now() % size;
+        let mut reward_cell;
+        loop {
+            // 如果生成贪吃蛇的食物在贪吃蛇的身体内，就重新生成
+            reward_cell = rnd(size);
+            if !snake.body.contains(&SnakeCell(reward_cell)) {
+                break;
+            }
+        }
         World {
             width,
             size,
-            snake: Snake::new(spawn_idx, 3),
+            snake,
             next_cell: None,
             reward_cell,
         }
