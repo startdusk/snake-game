@@ -91,6 +91,10 @@ impl World {
     }
 
     pub fn change_snake_dir(&mut self, direction: Direction) {
+        let next_cell = self.gen_next_snake_cell(&direction);
+        if self.snake.body.len() > 1 && self.snake.body[1].0 == next_cell.0 {
+            return;
+        }
         self.snake.direction = direction;
     }
 
@@ -116,7 +120,7 @@ impl World {
     pub fn step(&mut self) {
         // tmp是记录原贪吃蛇的位置信息，方便后面更新蛇身的位置
         let tmp = self.snake.body.clone();
-        let next_cell = self.gen_next_snake_cell();
+        let next_cell = self.gen_next_snake_cell(&self.snake.direction);
         // 更新贪吃蛇头的位置
         self.snake.body[0] = next_cell;
 
@@ -128,11 +132,11 @@ impl World {
         }
     }
 
-    fn gen_next_snake_cell(&self) -> SnakeCell {
+    fn gen_next_snake_cell(&self, direction: &Direction) -> SnakeCell {
         let snake_idx = self.snake_head_idx();
         let row = snake_idx / self.width;
         // 除法在wasm-pack打包后体积会很大，所以改用了加法
-        return match self.snake.direction {
+        return match direction {
             Direction::Right => {
                 let treshold = (row + 1) * self.width;
                 if snake_idx + 1 == treshold {
