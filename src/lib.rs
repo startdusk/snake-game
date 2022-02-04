@@ -199,6 +199,7 @@ impl World {
                         self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
                     } else {
                         self.reward_cell = 100;
+                        self.status = Some(GameStatus::Won);
                     }
                 }
             }
