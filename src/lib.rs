@@ -86,20 +86,12 @@ impl World {
     pub fn new(width: usize, spawn_idx: usize) -> World {
         let snake = Snake::new(spawn_idx, 3);
         let size = width * width;
-        let mut reward_cell;
-        loop {
-            // 如果生成贪吃蛇的食物在贪吃蛇的身体内，就重新生成
-            reward_cell = rnd(size);
-            if !snake.body.contains(&SnakeCell(reward_cell)) {
-                break;
-            }
-        }
         World {
             width,
+            reward_cell: World::gen_reward_cell(size, &snake.body),
             size,
             snake,
             next_cell: None,
-            reward_cell,
         }
     }
 
@@ -171,9 +163,22 @@ impl World {
 
         // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
         if self.reward_cell == self.snake_head_idx() {
-            // self.snake.body.push(SnakeCell(self.snake.body[1].0));
-            self.snake.body.push(SnakeCell(tmp[len - 1].0));
+            // 添加蛇身长度在蛇头后一个位置，整条蛇爬过后才会出现新的蛇身
+            self.snake.body.push(SnakeCell(self.snake.body[1].0));
+            self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body)
         }
+    }
+
+    fn gen_reward_cell(max: usize, snake_body: &Vec<SnakeCell>) -> usize {
+        let mut reward_cell;
+        loop {
+            // 如果生成贪吃蛇的食物在贪吃蛇的身体内，就重新生成
+            reward_cell = rnd(max);
+            if !snake_body.contains(&SnakeCell(reward_cell)) {
+                break;
+            }
+        }
+        reward_cell
     }
 
     fn gen_next_snake_cell(&self, direction: &Direction) -> SnakeCell {
