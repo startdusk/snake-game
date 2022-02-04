@@ -168,6 +168,11 @@ impl World {
         for i in 1..len {
             self.snake.body[i] = SnakeCell(tmp[i - 1].0);
         }
+
+        // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
+        if self.reward_cell == self.snake_head_idx() {
+            self.snake.body.push(SnakeCell(self.snake.body[1].0));
+        }
     }
 
     fn gen_next_snake_cell(&self, direction: &Direction) -> SnakeCell {
