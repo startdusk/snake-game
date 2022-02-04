@@ -171,7 +171,8 @@ impl World {
 
         // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
         if self.reward_cell == self.snake_head_idx() {
-            self.snake.body.push(SnakeCell(self.snake.body[1].0));
+            // self.snake.body.push(SnakeCell(self.snake.body[1].0));
+            self.snake.body.push(SnakeCell(tmp[len - 1].0));
         }
     }
 
@@ -207,7 +208,7 @@ impl World {
             Direction::Down => {
                 let treshold = snake_idx + ((self.width - row) * self.width);
                 if snake_idx + self.width == treshold {
-                    SnakeCell(treshold - ((row * 1) * self.width))
+                    SnakeCell(treshold - ((row + 1) * self.width))
                 } else {
                     SnakeCell(snake_idx + self.width)
                 }
