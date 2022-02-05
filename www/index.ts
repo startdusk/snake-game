@@ -7,7 +7,7 @@ const REWARD_COLOR = "#ff0000";
 
 init().then((wasm) => {
   const CELL_SIZE = 20;
-  const WORLD_WIDTH = 4;
+  const WORLD_WIDTH = 20;
   const snakeSpawnIdx = rnd(WORLD_WIDTH * WORLD_WIDTH);
 
   const world = World.new(WORLD_WIDTH, snakeSpawnIdx);
