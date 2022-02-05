@@ -1,6 +1,6 @@
 # snake-game
 
-[Visit Hero](https://snakygame.herokuapp.com/)
+[Visit Here](https://snakygame.herokuapp.com/)
 
 Local Run:
 
