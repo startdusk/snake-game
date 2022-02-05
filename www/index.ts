@@ -118,6 +118,7 @@ init().then((wasm) => {
     const status = world.game_status();
     if (status === GameStatus.Won || status === GameStatus.Lost) {
       gameControlBtn.textContent = "Re-Play";
+      drawGameStatus();
       return;
     }
     const fps = 3;
