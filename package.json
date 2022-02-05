@@ -20,8 +20,9 @@
     "url": "https://github.com/startdusk/snake-game/issues"
   },
   "homepage": "https://github.com/startdusk/snake-game#readme",
-  "devDependencies": {
+  "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.17.2"
-  }
+  },
+  "devDependencies": {}
 }
