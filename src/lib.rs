@@ -66,7 +66,7 @@ pub struct World {
     size: usize,
     snake: Snake,
     next_cell: Option<SnakeCell>,
-    reward_cell: usize,
+    reward_cell: Option<usize>,
     status: Option<GameStatus>,
 }
 
@@ -109,7 +109,7 @@ impl World {
         self.width
     }
 
-    pub fn reward_cell(&self) -> usize {
+    pub fn reward_cell(&self) -> Option<usize> {
         self.reward_cell
     }
 
@@ -195,14 +195,14 @@ impl World {
                 }
 
                 // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度
-                if self.reward_cell == self.snake_head_idx() {
+                if self.reward_cell == Some(self.snake_head_idx()) {
                     // 添加蛇身长度在蛇头后一个位置，整条蛇爬过后才会出现新的蛇身
                     self.snake.body.push(SnakeCell(self.snake.body[1].0));
 
                     if self.snake_length() < self.size {
                         self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
                     } else {
-                        self.reward_cell = 100;
+                        self.reward_cell = None;
                         self.status = Some(GameStatus::Won);
                     }
                 }
@@ -213,7 +213,7 @@ impl World {
         }
     }
 
-    fn gen_reward_cell(max: usize, snake_body: &Vec<SnakeCell>) -> usize {
+    fn gen_reward_cell(max: usize, snake_body: &Vec<SnakeCell>) -> Option<usize> {
         let mut reward_cell;
         loop {
             // 如果生成贪吃蛇的食物在贪吃蛇的身体内，就重新生成
@@ -222,7 +222,7 @@ impl World {
                 break;
             }
         }
-        reward_cell
+        Some(reward_cell)
     }
 
     fn gen_next_snake_cell(&self, direction: &Direction) -> SnakeCell {
