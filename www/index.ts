@@ -1,4 +1,4 @@
-import init, { World, Direction } from "snake_game";
+import init, { World, Direction, GameStatus } from "snake_game";
 import { rnd } from "./utils/md";
 
 const HEADER_COLOR = "#7878db";
@@ -13,6 +13,7 @@ init().then((wasm) => {
   const world = World.new(WORLD_WIDTH, snakeSpawnIdx);
   const worldWidth = world.width();
 
+  const points = document.getElementById("points");
   const gameStatus = document.getElementById("game-status");
   const gameControlBtn = document.getElementById("game-control-btn");
   const canvas = <HTMLCanvasElement>document.getElementById("snake-canvas");
@@ -87,8 +88,6 @@ init().then((wasm) => {
       world.snake_length()
     );
 
-    // filter out duplicates
-    // reverse array
     snakeCells
       .filter((cellIdx, i) => !(i > 0 && cellIdx === snakeCells[0]))
       .forEach((cellIdx, i) => {
@@ -105,6 +104,12 @@ init().then((wasm) => {
 
   function drawGameStatus() {
     gameStatus.textContent = world.game_status_text();
+    points.textContent = world.points().toString();
+
+    const status = world.game_status();
+    if (status === GameStatus.Won || status === GameStatus.Lost) {
+      gameControlBtn.textContent = "Re-Play";
+    }
   }
 
   function paint() {
