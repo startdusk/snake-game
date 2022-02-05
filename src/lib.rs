@@ -185,9 +185,13 @@ impl World {
 
                 // 更新贪吃蛇蛇身的位置
                 // 蛇头更新了，那蛇身就会往原蛇头的位置挪动并覆盖
-                let len = self.snake.body.len();
-                for i in 1..len {
+                for i in 1..self.snake_length() {
                     self.snake.body[i] = SnakeCell(tmp[i - 1].0);
+                }
+
+                // 检查蛇头是否撞到了蛇身
+                if self.snake.body[1..self.snake_length()].contains(&self.snake.body[0]) {
+                    self.status = Some(GameStatus::Lost)
                 }
 
                 // 贪吃蛇吃掉了食物，就在蛇尾添加蛇身长度

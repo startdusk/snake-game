@@ -89,6 +89,8 @@ init().then((wasm) => {
     snakeCells.forEach((cellIdx, i) => {
       const col = cellIdx % worldWidth;
       const row = Math.floor(cellIdx / worldWidth);
+
+      // we are overriding snake head color by body when we crush
       ctx.fillStyle = i === 0 ? HEADER_COLOR : UNHEADER_COLOR;
       ctx.beginPath();
       ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
