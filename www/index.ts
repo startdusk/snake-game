@@ -128,6 +128,7 @@ init().then((wasm) => {
       world.step();
       // the method takes a callback
       // to invoked before the next repaint
+      // window.requestAnimationFrame 这个 Web API ，主要用来替代曾经的 window.setInterval 和 window.setTimeout 函数，以专门用于处理需要进行“动画绘制”的场景。
       requestAnimationFrame(play);
     }, 1000 / fps);
   }
